@@ -1,0 +1,81 @@
+#include <cs50.h>
+#include <ctype.h>
+#include <stdio.h>
+#include <string.h>
+
+bool check(string word);
+string cipher(string plain, string key);
+string LETTERS = "abcdefghijklmnopqrstuvwxyz";
+
+int main(int argc, string argv[])
+{
+    if (argc != 2)
+    {
+        printf("Usage: ./substitution key");
+        return 1;
+    }
+    else if (strlen(argv[1]) != 26)
+    {
+        printf("Key must contain 26 characters");
+        return 1;
+    }
+
+    bool passing = check(argv[1]);
+    if (passing == false)
+    {
+        printf("Invalid or repeat characters");
+        return 1;
+    }
+
+    string plain = get_string("plaintext:  ");
+    printf("ciphertext: %s\n", cipher(plain, argv[1]));
+}
+
+bool check(string key)
+{
+    int lenght = strlen(key);
+    for (int i = 0; i < lenght; i++)
+    {
+        if (!isalpha(key[i]))
+        {
+            return false;
+        }
+        for (int j = i + 1; j < lenght; j++)
+        {
+            if (key[j] == key[i])
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+string cipher(string plain, string key)
+{
+    int alpa = strlen(LETTERS);
+    string cipher = plain;
+    for (int i = 0, n = strlen(plain); i < n; i++)
+    {
+        for (int j = 0; j < alpa; j++)
+        {
+            if (tolower(plain[i]) == LETTERS[j] && islower(plain[i]))
+            {
+                cipher[i] = tolower(key[j]);
+                break;
+            }
+            else if (tolower(plain[i]) == LETTERS[j] && isupper(plain[i]))
+            {
+                printf("The plain is %c, the key: %c \n", plain[i], key[j]);
+                cipher[i] = toupper(key[j]);
+                break;
+            }
+            else if (isspace(plain[i]) || ispunct(plain[i]) || isdigit(plain[i]))
+            {
+                cipher[i] = plain[i];
+                break;
+            }
+        }
+    }
+    return cipher;
+}
