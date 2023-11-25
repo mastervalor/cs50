@@ -11,15 +11,20 @@ person;
 
 int main(void)
 {
-    string name[] = {"craid", "david"};
-    string numbers[] = {"323", "232"};
+    person people[2];
+
+    people[0].name = "craid";
+    people[0].number = "323";
+
+    people[1].name = "david";
+    people[1].number = "232";
 
     string search = get_string("Name: ");
     for(int i = 0; i < 2; i++)
     {
-        if (strcmp(name[i], search) == 0)
+        if (strcmp(people[i].name, search) == 0)
         {
-            printf("Found %s\n", numbers[i]);
+            printf("Found %s\n", people[i].number);
             return 0;
         }
     }
