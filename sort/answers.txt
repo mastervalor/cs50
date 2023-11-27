@@ -1,0 +1,19 @@
+sort1 uses: Bubble Sort
+
+How do you know?: worst times
+
+sort2 uses: Merge Sort
+
+How do you know?: best times
+
+sort3 uses: Selection Sort
+
+How do you know?: inbetween for times
+
+
+
+File name          sort 1 time           sort 2 time           sort 3 time
+reversed10000       .24                     .06                     .14
+reversed50000       4.7                     .3                      2.3
+random50000.txt     5.5                     .29                     2.1
+sorted50000.txt     .28                     .29                     2.3
