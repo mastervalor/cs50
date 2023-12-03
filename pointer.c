@@ -1,5 +1,6 @@
 # include <stdio.h>
 
+
 int main(void)
 {
     int n = 50;
@@ -8,4 +9,6 @@ int main(void)
     //or declar a variable to be a pointer
     int *p = &n;
     printf("pointer is %p\n", p);
+    //to go and get the value from the pointer is poting to
+    printf("pointer is %i\n", *p);
 }
