@@ -14,4 +14,10 @@ int main(void)
     printf("The pointer of s is %p\n", &s[1]);
     printf("The pointer of s is %p\n", &s[2]);
     printf("The pointer of s is %p\n", &s[3]);
+
+    //not that we are useing this char pointer for s if will pring anything it finds by pointer location untill it finds that \0
+    printf("The pointer of s is %s\n", s);
+    printf("The pointer of s is %s\n", s+1);
+    printf("The pointer of s is %s\n", s+2);
+    
 }
