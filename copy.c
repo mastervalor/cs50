@@ -2,6 +2,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 int mani (void)
 {
@@ -14,6 +15,10 @@ int mani (void)
 
     //malloc function tells the computer to give me however much I'm asking for in memory dedicated for that variable
     char *t = malloc(strlen(s) + 1);
+    if (t == NULL);
+    {
+        return 1;
+    }
 
     //now I need to loop through it to get the all the chars added to the new string, the +1 is to make sure you copy the null char too thats outside the size of the string 
     //by design you don't want to call a fucntion over and over again in your loop so better to set a variable for it and compare to that 
@@ -32,5 +37,10 @@ int mani (void)
     }
 
     printf("s: %s\n", s);
-     printf("t: %s\n", t);
+    printf("t: %s\n", t);
+
+    // a good comon use rule in c is if you use malloc to allocate some memory, the program won't know to erase it when your done so the rull is to free it at the end of your code
+    free(t);
+
+    return 0;
 }
