@@ -10,8 +10,9 @@ int mani (void)
     //malloc function tells the computer to give me however much I'm asking for in memory dedicated for that variable
     char *t = malloc(strlen(s) + 1);
 
-    //now I need to loop through it to get the all the chars added to the new string
-    for (int i = 0; i < strlen(s) + 1; i++)
+    //now I need to loop through it to get the all the chars added to the new string, the +1 is to make sure you copy the null char too thats outside the size of the string 
+    //by design you don't want to call a fucntion over and over again in your loop so better to set a variable for it and compare to that 
+    for (int i = 0, n = strlen(s) + 1; i < n; i++)
     {
         t[i] = s[i];
     }
