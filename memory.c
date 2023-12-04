@@ -12,6 +12,7 @@ int main(void)
     int y = 2;
 
     printf("x is %i, y is %i\n", x, y);
+    //you have to give it & to give it the address
     swap(&x, &y);
     printf("x is %i, y is %i\n", x, y);
 }
