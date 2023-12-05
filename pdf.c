@@ -25,11 +25,18 @@ int main (int argc, string argv[])
     //the 8 here denotes this is only 8 bits or a single byte for an integer
     //the _t just means that all of that will be its own type.
     uint8_t buffer[4];
+    uint8_t signature[] = {37, 80, 68, 70};
     fread(buffer, 1, 4, file);
 
     for (int i = 0; 1 < 4; i++)
     {
-        printf("%i", buffer[i]);
-    }
-}
+        if (buffer[i] != signature[i])
+        {
+            printf("Likely not a PDF. \n");
+            return 0;
+        }
 
+    }
+    printf("Likely a PDF. \n");
+    printf("\n");
+}
