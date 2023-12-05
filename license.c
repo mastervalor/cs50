@@ -1,39 +1,53 @@
+// Modifies the volume of an audio file
+
+#include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
+
+// Number of bytes in .wav header
+const int HEADER_SIZE = 44;
 
 int main(int argc, char *argv[])
 {
-    // Check for command line args
-    if (argc != 2)
+    // Check command-line arguments
+    if (argc != 4)
     {
-        printf("Usage: ./read infile\n");
+        printf("Usage: ./volume input.wav output.wav factor\n");
         return 1;
     }
 
-    // Create buffer to read into
-    char buffer[7];
-
-    // Create array to store plate numbers
-    char plates[8][7];
-
-    FILE *infile = fopen(argv[1], "r");
-
-    int idx = 0;
-
-    while (fread(buffer, 1, 7, infile) == 7)
+    // Open files and determine scaling factor
+    FILE *input = fopen(argv[1], "r");
+    if (input == NULL)
     {
-        // Replace '\n' with '\0'
-        buffer[6] = '\0';
-
-        for (int i = 0; i < 7; i++)
-        {
-            plates[idx][i] = buffer[i];
-        }
-        // Save plate number in array
-        idx++;
+        printf("Could not open file.\n");
+        return 1;
     }
 
-    for (int i = 0; i < 8; i++)
+    FILE *output = fopen(argv[2], "w");
+    if (output == NULL)
     {
-        printf("%s\n", plates[i]);
+        printf("Could not open file.\n");
+        return 1;
     }
+
+    float factor = atof(argv[3]);
+
+    uint8_t header[HEADER_SIZE];
+
+    fread(header, 1, HEADER_SIZE, input);
+    fwrite(header, 1, HEADER_SIZE, output);
+
+
+    int16_t buffer;
+
+    while (fread(&buffer, sizeof(int16_t), 1, input))
+    {
+        buffer *= factor;
+        fwrite(&buffer, sizeof(int16_t), 1, output);
+    }
+
+    // Close files
+    fclose(input);
+    fclose(output);
 }
