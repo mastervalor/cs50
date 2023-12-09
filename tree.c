@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 // Represents a node
 typedef struct node
@@ -9,7 +10,7 @@ typedef struct node
     struct node *right;
 }
 node;
-
+bool search(node *tree, int number);
 void free_tree(node *root);
 void print_tree(node *root);
 
@@ -81,4 +82,24 @@ void print_tree(node *root)
     print_tree(root->left);
     printf("%i\n", root->number);
     print_tree(root->right);
+}
+
+bool search(node *tree, int number)
+{
+    if (tree == NULL)
+    {
+        return false;
+    }
+    else if (number < tree->number)
+    {
+        return search(tree->left, number);
+    }
+    else if (number > tree->number)
+    {
+        return search(tree->right, number);
+    }
+    else if (number == tree->number)
+    {
+        return true;
+    }
 }
