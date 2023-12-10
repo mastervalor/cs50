@@ -1,9 +1,12 @@
 // Implements a dictionary's functionality
 
+#include "dictionary.h"
 #include <ctype.h>
 #include <stdbool.h>
-
-#include "dictionary.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
 
 // Represents a node in a hash table
 typedef struct node
@@ -12,8 +15,9 @@ typedef struct node
     struct node *next;
 } node;
 
-// TODO: Choose number of buckets in hash table
+// number of buckets in hash table
 const unsigned int N = 26;
+int count = 0;
 
 // Hash table
 node *table[N];
@@ -21,7 +25,18 @@ node *table[N];
 // Returns true if word is in dictionary, else false
 bool check(const char *word)
 {
-    // TODO
+    int hashNumber = hash(word);
+    node *cursor = table[hashNumber];
+
+    while (cursor != NULL)
+    {
+        if (strcasecmp(cursor->word, word) == 0)
+        {
+            return true;
+        }
+
+        cursor = cursor->next;
+    }
     return false;
 }
 
@@ -35,20 +50,59 @@ unsigned int hash(const char *word)
 // Loads dictionary into memory, returning true if successful, else false
 bool load(const char *dictionary)
 {
-    // TODO
-    return false;
+    FILE *dictfile = fopen(dictionary, "r");
+    if (dictfile == NULL)
+    {
+        return false;
+    }
+
+    char str[LENGTH + 1];
+    while (fscanf(dictfile, "%s", str) != EOF)
+    {
+        node *temp = malloc(sizeof(node));
+
+        if (temp == NULL)
+        {
+            return false;
+        }
+
+        strcpy(temp->word, str);
+
+        int hashNumber = hash(str);
+
+        if (table[hashNumber] == NULL)
+        {
+            temp->next = NULL;
+        }
+        else
+        {
+            temp->next = table[hashNumber];
+        }
+        table[hashNumber] = temp;
+        count++;
+    }
+    fclose(dictfile);
+    return true;
 }
 
 // Returns number of words in dictionary if loaded, else 0 if not yet loaded
 unsigned int size(void)
 {
-    // TODO
-    return 0;
+    return count;
 }
 
 // Unloads dictionary from memory, returning true if successful, else false
 bool unload(void)
 {
-    // TODO
-    return false;
+    for (int i = 0; i < N; i++)
+    {
+        node *cursor = table[i];
+        while (cursor)
+        {
+            node *temp = cursor;
+            cursor = cursor->next;
+            free(temp);
+        }
+    }
+    return true;
 }
