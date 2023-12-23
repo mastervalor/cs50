@@ -47,3 +47,6 @@ SELECT p.passport_number FROM flights f JOIN passengers p ON f.id = p.flight_id 
 --18  8                  6                       2021  7      29   16    0       18         3592750733       4C
 --36  8                  4                       2021  7      29   8     20      36         5773159633       4A
 --36  8                  4                       2021  7      29   8     20      36         1988161715       6D
+--now lets find the destination airporut I think its 4
+select * from airports where id = 4;
+--4   LGA           LaGuardia Airport  New York City
