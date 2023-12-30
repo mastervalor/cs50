@@ -242,5 +242,69 @@ def register():
 @app.route("/sell", methods=["GET", "POST"])
 @login_required
 def sell():
-    """Sell shares of stock"""
-    return apology("TODO")
+    """Sell shares of stock."""
+
+    # User reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+
+        # Ensure symbol was selected
+        symbol = request.form.get("symbol")
+        if not symbol:
+            return apology("must select a stock", 403)
+
+        # Ensure shares were submitted
+        elif not request.form.get("shares"):
+            return apology("must provide number of shares", 403)
+
+        # Ensure shares is a positive integer
+        try:
+            shares = int(request.form.get("shares"))
+            if shares <= 0:
+                raise ValueError()
+        except ValueError:
+            return apology("number of shares must be a positive integer", 403)
+
+        # Query the database for the user's shares of the selected stock
+        user_shares = db.execute("""
+            SELECT SUM(shares) as total_shares
+            FROM purchases
+            WHERE user_id = ? AND symbol = ?
+            GROUP BY symbol
+            HAVING total_shares > 0
+        """, session["user_id"], symbol)
+
+        # Ensure the user owns that many shares of the stock
+        if not user_shares or user_shares[0]["total_shares"] < shares:
+            return apology("not enough shares to sell", 403)
+
+        # Lookup stock information
+        quote_info = lookup(symbol)
+
+        # Calculate the total value of the sale
+        total_value = quote_info["price"] * shares
+
+        # Record the sale in the database
+        db.execute("""
+            INSERT INTO purchases (user_id, symbol, shares, price, timestamp)
+            VALUES (?, ?, ?, ?, datetime('now'))
+        """, session["user_id"], symbol, -shares, quote_info["price"])
+
+        # Update user's cash balance
+        db.execute("UPDATE users SET cash = cash + ? WHERE id = ?", total_value, session["user_id"])
+
+        # Redirect user to home page
+        return redirect("/")
+
+    # User reached route via GET (as by clicking a link or via redirect)
+    else:
+        # Query the database for the user's stocks to populate the select menu
+        stocks = db.execute("""
+            SELECT symbol
+            FROM purchases
+            WHERE user_id = ?
+            GROUP BY symbol
+            HAVING SUM(shares) > 0
+        """, session["user_id"])
+
+        # Render the sell template with the user's stocks
+        return render_template("sell.html", stocks=stocks)
