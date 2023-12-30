@@ -33,8 +33,31 @@ def after_request(response):
 @app.route("/")
 @login_required
 def index():
-    """Show portfolio of stocks"""
-    return apology("TODO")
+    """Show portfolio of stocks."""
+
+    # Query the database for the user's portfolio
+    portfolio = db.execute("""
+        SELECT symbol, SUM(shares) as total_shares
+        FROM purchases
+        WHERE user_id = ?
+        GROUP BY symbol
+        HAVING total_shares > 0
+    """, session["user_id"])
+
+    # Get the current cash balance of the user
+    cash = db.execute("SELECT cash FROM users WHERE id = ?", session["user_id"])[0]["cash"]
+
+    # Calculate the total value of each stock and the grand total
+    grand_total = cash
+    for stock in portfolio:
+        quote_info = lookup(stock["symbol"])
+        stock["name"] = quote_info["name"]
+        stock["price"] = quote_info["price"]
+        stock["total_value"] = stock["price"] * stock["total_shares"]
+        grand_total += stock["total_value"]
+
+    # Render the portfolio template with the user's portfolio and cash balance
+    return render_template("index.html", portfolio=portfolio, cash=cash, grand_total=grand_total)
 
 
 @app.route("/buy", methods=["GET", "POST"])
