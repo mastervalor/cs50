@@ -69,11 +69,11 @@ def buy():
 
         # Ensure symbol was submitted
         if not request.form.get("symbol"):
-            return apology("must provide stock symbol", 403)
+            return apology("must provide stock symbol", 400)
 
         # Ensure shares were submitted
         elif not request.form.get("shares"):
-            return apology("must provide number of shares", 403)
+            return apology("must provide number of shares", 400)
 
         # Ensure shares is a positive integer
         try:
@@ -81,14 +81,14 @@ def buy():
             if shares <= 0:
                 raise ValueError()
         except ValueError:
-            return apology("number of shares must be a positive integer", 403)
+            return apology("number of shares must be a positive integer", 400)
 
         # Lookup stock information
         quote_info = lookup(request.form.get("symbol"))
 
         # Check if the symbol is valid
         if not quote_info:
-            return apology("invalid stock symbol", 403)
+            return apology("invalid stock symbol", 400)
 
         # Get user's current cash balance
         user_cash = db.execute("SELECT cash FROM users WHERE id = ?", session["user_id"])[0]["cash"]
@@ -98,7 +98,7 @@ def buy():
 
         # Check if the user can afford the purchase
         if total_cost > user_cash:
-            return apology("insufficient funds", 403)
+            return apology("insufficient funds", 400)
 
         # Record the purchase in the database
         db.execute("INSERT INTO purchases (user_id, symbol, shares, price, timestamp) VALUES (?, ?, ?, ?, ?)",
@@ -144,18 +144,18 @@ def login():
 
         # Ensure username was submitted
         if not request.form.get("username"):
-            return apology("must provide username", 403)
+            return apology("must provide username", 400)
 
         # Ensure password was submitted
         elif not request.form.get("password"):
-            return apology("must provide password", 403)
+            return apology("must provide password", 400)
 
         # Query database for username
         rows = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username"))
 
         # Ensure username exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
-            return apology("invalid username and/or password", 403)
+            return apology("invalid username and/or password", 400)
 
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
@@ -189,14 +189,14 @@ def quote():
 
         # Ensure symbol was submitted
         if not request.form.get("symbol"):
-            return apology("must provide stock symbol", 403)
+            return apology("must provide stock symbol", 400)
 
         # Lookup stock information
         quote_info = lookup(request.form.get("symbol"))
 
         # Check if the symbol is valid
         if not quote_info:
-            return apology("invalid stock symbol", 403)
+            return apology("invalid stock symbol", 400)
 
         # Render the quoted template with stock information
         return render_template("quoted.html", symbol=quote_info["symbol"],
@@ -260,11 +260,11 @@ def sell():
         # Ensure symbol was selected
         symbol = request.form.get("symbol")
         if not symbol:
-            return apology("must select a stock", 403)
+            return apology("must select a stock", 400)
 
         # Ensure shares were submitted
         elif not request.form.get("shares"):
-            return apology("must provide number of shares", 403)
+            return apology("must provide number of shares", 400)
 
         # Ensure shares is a positive integer
         try:
@@ -272,7 +272,7 @@ def sell():
             if shares <= 0:
                 raise ValueError()
         except ValueError:
-            return apology("number of shares must be a positive integer", 403)
+            return apology("number of shares must be a positive integer", 400)
 
         # Query the database for the user's shares of the selected stock
         user_shares = db.execute("""
@@ -285,7 +285,7 @@ def sell():
 
         # Ensure the user owns that many shares of the stock
         if not user_shares or user_shares[0]["total_shares"] < shares:
-            return apology("not enough shares to sell", 403)
+            return apology("not enough shares to sell", 400)
 
         # Lookup stock information
         quote_info = lookup(symbol)
@@ -330,14 +330,14 @@ def addcash():
         # Ensure additional cash amount was submitted
         additional_cash = request.form.get("additionalcash")
         if not additional_cash:
-            return apology("must provide additional cash amount", 403)
+            return apology("must provide additional cash amount", 400)
 
         try:
             additional_cash = float(additional_cash)
             if additional_cash <= 0:
                 raise ValueError()
         except ValueError:
-            return apology("additional cash must be a positive number", 403)
+            return apology("additional cash must be a positive number", 400)
 
         # Update the user's cash balance in the database
         db.execute("UPDATE users SET cash = cash + ? WHERE id = ?", additional_cash, session["user_id"])
