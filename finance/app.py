@@ -1,5 +1,4 @@
 import os
-
 from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
@@ -109,7 +108,43 @@ def quote():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     """Register user"""
-    return apology("TODO")
+    session.clear()
+    # User reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+
+        # Ensure username was submitted
+        if not request.form.get("username"):
+            return apology("must provide username", 403)
+
+        # Ensure password was submitted
+        elif not request.form.get("password"):
+            return apology("must provide password", 403)
+
+        # Ensure password confirmation was submitted
+        elif not request.form.get("confirmation"):
+            return apology("must confirm password", 403)
+
+        # Ensure passwords match
+        elif request.form.get("password") != request.form.get("confirmation"):
+            return apology("passwords do not match", 403)
+
+        # Hash the password
+        hashed_password = generate_password_hash(request.form.get("password"))
+
+        # Insert the new user into the database
+        result = db.execute("INSERT INTO users (username, hash) VALUES (?, ?)",
+                            request.form.get("username"), hashed_password)
+
+        # Check if the username already exists
+        if not result:
+            return apology("username already exists", 403)
+
+        # Redirect user to login page
+        return redirect("/login")
+
+    # User reached route via GET (as by clicking a link or via redirect)
+    else:
+        return render_template("register.html")
 
 
 @app.route("/sell", methods=["GET", "POST"])
