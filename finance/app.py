@@ -318,3 +318,33 @@ def sell():
 
         # Render the sell template with the user's stocks
         return render_template("sell.html", stocks=stocks)
+    
+@app.route("/addcash", methods=["GET", "POST"])
+@login_required
+def addcash():
+    """Add additional cash to user's account."""
+
+    # User reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+
+        # Ensure additional cash amount was submitted
+        additional_cash = request.form.get("additionalcash")
+        if not additional_cash:
+            return apology("must provide additional cash amount", 403)
+
+        try:
+            additional_cash = float(additional_cash)
+            if additional_cash <= 0:
+                raise ValueError()
+        except ValueError:
+            return apology("additional cash must be a positive number", 403)
+
+        # Update the user's cash balance in the database
+        db.execute("UPDATE users SET cash = cash + ? WHERE id = ?", additional_cash, session["user_id"])
+
+        # Redirect user to home page
+        return redirect("/")
+
+    # User reached route via GET (as by clicking a link or via redirect)
+    else:
+        return render_template("addcash.html")
