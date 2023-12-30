@@ -1,12 +1,25 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Quoted
+    Quote
 {% endblock %}
 
 {% block main %}
     <h2>Stock Quote</h2>
-    <p>Symbol: {{ symbol }}</p>
-    <p>Name: {{ name }}</p>
-    <p>Price: {{ price }}</p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Symbol</th>
+                <th>Name</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ lookup_result.symbol }}</td>
+                <td>{{ lookup_result.name }}</td>
+                <td>{{ lookup_result.price | usd }}</td>
+            </tr>
+        </tbody>
+    </table>
 {% endblock %}

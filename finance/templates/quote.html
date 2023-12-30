@@ -5,10 +5,12 @@
 {% endblock %}
 
 {% block main %}
+    <h2>Get Stock Quote</h2>
     <form action="/quote" method="post">
         <div class="form-group">
-            <input autocomplete="off" autofocus class="form-control" name="symbol" placeholder="Stock Symbol" type="text">
+            <label for="symbol">Symbol:</label>
+            <input type="text" name="symbol" class="form-control" required>
         </div>
-        <button class="btn btn-primary" type="submit">Get Quote</button>
+        <button type="submit" class="btn btn-primary">Get Quote</button>
     </form>
 {% endblock %}

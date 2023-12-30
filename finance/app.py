@@ -119,17 +119,11 @@ def buy():
 @login_required
 def history():
     """Show history of transactions."""
+    # Retrieve user's purchase history from the database
+    purchases = db.execute("SELECT * FROM purchases WHERE user_id = ? ORDER BY timestamp DESC",
+                           session["user_id"])
 
-    # Query the database for the user's transaction history
-    history = db.execute("""
-        SELECT symbol, shares, price, timestamp
-        FROM purchases
-        WHERE user_id = ?
-        ORDER BY timestamp DESC
-    """, session["user_id"])
-
-    # Render the history template with the user's transaction history
-    return render_template("history.html", history=history)
+    return render_template("history.html", purchases=purchases)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -183,34 +177,26 @@ def logout():
 @login_required
 def quote():
     """Get stock quote."""
-
-    # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
+        symbol = request.form.get("symbol")
+        if not symbol:
+            return apology("must provide symbol", 400)
 
-        # Ensure symbol was submitted
-        if not request.form.get("symbol"):
-            return apology("must provide stock symbol", 400)
+        lookup_result = lookup(symbol)
+        if lookup_result is None:
+            return apology("invalid symbol", 400)
 
-        # Lookup stock information
-        quote_info = lookup(request.form.get("symbol"))
+        return render_template("quoted.html", lookup_result=lookup_result)
 
-        # Check if the symbol is valid
-        if not quote_info:
-            return apology("invalid stock symbol", 400)
-
-        # Render the quoted template with stock information
-        return render_template("quoted.html", symbol=quote_info["symbol"],
-                               name=quote_info["name"], price=quote_info["price"])
-
-    # User reached route via GET (as by clicking a link or via redirect)
-    else:
-        return render_template("quote.html")
+    # For GET requests, render the form
+    return render_template("quote.html")
 
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
     """Register user"""
     session.clear()
+
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
 
@@ -230,16 +216,17 @@ def register():
         elif request.form.get("password") != request.form.get("confirmation"):
             return apology("passwords do not match", 400)
 
+        # Check if the username already exists
+        existing_user = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username"))
+        if existing_user:
+            return apology("username already exists", 400)
+
         # Hash the password
         hashed_password = generate_password_hash(request.form.get("password"))
 
         # Insert the new user into the database
-        result = db.execute("INSERT INTO users (username, hash) VALUES (?, ?)",
-                            request.form.get("username"), hashed_password)
-
-        # Check if the username already exists
-        if not result:
-            return apology("username already exists", 400)
+        db.execute("INSERT INTO users (username, hash) VALUES (?, ?)",
+                    request.form.get("username"), hashed_password)
 
         # Redirect user to login page
         return redirect("/login")
