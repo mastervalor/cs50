@@ -41,7 +41,55 @@ def index():
 @login_required
 def buy():
     """Buy shares of stock"""
-    return apology("TODO")
+    # User reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+
+        # Ensure symbol was submitted
+        if not request.form.get("symbol"):
+            return apology("must provide stock symbol", 403)
+
+        # Ensure shares were submitted
+        elif not request.form.get("shares"):
+            return apology("must provide number of shares", 403)
+
+        # Ensure shares is a positive integer
+        try:
+            shares = int(request.form.get("shares"))
+            if shares <= 0:
+                raise ValueError()
+        except ValueError:
+            return apology("number of shares must be a positive integer", 403)
+
+        # Lookup stock information
+        quote_info = lookup(request.form.get("symbol"))
+
+        # Check if the symbol is valid
+        if not quote_info:
+            return apology("invalid stock symbol", 403)
+
+        # Get user's current cash balance
+        user_cash = db.execute("SELECT cash FROM users WHERE id = ?", session["user_id"])[0]["cash"]
+
+        # Calculate the total cost of the purchase
+        total_cost = quote_info["price"] * shares
+
+        # Check if the user can afford the purchase
+        if total_cost > user_cash:
+            return apology("insufficient funds", 403)
+
+        # Record the purchase in the database
+        db.execute("INSERT INTO purchases (user_id, symbol, shares, price, timestamp) VALUES (?, ?, ?, ?, ?)",
+                   session["user_id"], quote_info["symbol"], shares, quote_info["price"], datetime.now())
+
+        # Update user's cash balance
+        db.execute("UPDATE users SET cash = cash - ? WHERE id = ?", total_cost, session["user_id"])
+
+        # Redirect user to home page
+        return redirect("/")
+
+    # User reached route via GET (as by clicking a link or via redirect)
+    else:
+        return render_template("buy.html")
 
 
 @app.route("/history")
