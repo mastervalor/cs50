@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" 
+    integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <title>Rideshare dashbord</title>
+</head>
+<body>
+    <div class="d-flex justify-content-evenly border border-bottom border-dark">
+        <h1>Welcome {{user.first_name}}!</h1>
+        <a href="/rides/new" class="btn btn-info">Request a ride</a>
+        <a href="/logout" class="btn btn-info">Logout</a>
+    </div>
+    <div class="d-flex justify-content-evenly">
+        <div class="col-4">
+            {% for request in requests %}
+                <div class="card card-body">
+                    <p class="card-text">Rider: {{request.rider_name}}</p>
+                    <p class="card-text">Destination: {{request.destination}}</p>
+                    <p class="card-text">When needed: {{request.date}}</p>
+                    {% if request.rider_id == session['user_id'] %}
+                        <a href="/ride/delete/{{request.id}}" class="card-footer">DELETE</a>
+                    {% else %}
+                        <a href="/ride/accept/{{request.id}}" class="card-footer">I can drive!</a>
+                    {% endif %}
+                </div>
+                <br>
+            {% endfor %}
+        </div>
+        <div class="col-4">
+            {% for booked in booked_rides %}
+                <div class="card card-body">
+                    <p class="card-text">
+                        {{booked.driver_name}} is driving {{booked.rider_name}}
+                        to {{booked.destination}} on {{booked.date}}
+                    </p>
+                    {% if booked.driver_id == session['user_id'] %}
+                        <a href="/ride/details/{{booked.id}}" class="card-footer">Details</a> | <a href="/ride/cancel/{{booked.id}}" class="card-footer">Cancel</a>
+                    {% elif booked.rider_id == session['user_id'] %}
+                        <a href="/ride/details/{{booked.id}}" class="card-footer">Details</a>
+                    {% endif %}
+                </div>
+                <br>
+            {% endfor %}
+        </div>
+    </div>
+</body>

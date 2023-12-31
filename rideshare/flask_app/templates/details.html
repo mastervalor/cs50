@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" 
+    integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <title>Rideshare dashbord</title>
+</head>
+<body>
+    <div class=" container">
+        <div class="col-6 text-left">
+            <a href="/rides/dashboard" class="btn btn-info">Home</a>
+            <a href="/logout" class="btn btn-info">Logout</a>
+        </div>
+        <div class="col-6 card-body border border-bottom border-dark">
+            <h1 class=" card-header">Read for your trip to the {{ride.destination}}?</h1>
+            <br>
+            <p class="card-body"> Who's driving? {{ride.driver_name}}</p>
+            <br>
+            <p class="card-body">Who's coming along? {{ride.rider_name}}</p>
+            <br>
+            <p class="card-body">Date: {{ride.date}}</p>
+            <br>
+            <p class="card-body">Pick-up location: {{ride.pick_up}}</p>
+            <br>
+            <p class="card-body">Details: {{ride.details}}</p>
+            <br>
+            <a href="/ride/edit/{{ride.id}}" class="card-footer">Edit</a> |<a href="/ride/delete/{{ride.id}}" class="card-footer">DELETE</a>
+        </div>
+        <div class="col-6">
+            <h4>Ride Messages:</h4>
+            {% for message in messages %}
+                <p>{{message.user_name}}:     {{message.content}}</p>
+            {% endfor %}
+            <form action="/message/add" method="POST" class="form-group">
+                <input type="hidden" name="ride_id" value="{{ride.id}}">
+                <input type="text" name="content" class="form-control">
+                <input type="submit" value="Send Message" class="btn btn-success float-left">
+            </form>
+        </div>
+    </div>
+</body>

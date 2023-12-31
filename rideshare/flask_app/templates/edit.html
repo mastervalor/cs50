@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" 
+    integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <title>Rideshare dashbord</title>
+</head>
+<body>
+    <div class="container">
+        <div class="d-flex justify-content-evenly">
+            <h1>Update the Details</h1>
+            <a href="/rides/dashboard" class="btn btn-info">Home</a>
+            <a href="/logout" class="btn btn-info">Logout</a>
+        </div>
+        {% with messages = get_flashed_messages(category_filter=['edit']) %}
+            {% if messages %}
+                <div class="alert alert-danger" role="alert">
+                    {% for message in messages %}
+                        <p>{{message}}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <form action="/ride/update/{{ride.id}}" method="POST" class="form-group">
+            <div class="d-flex justify-content-evenly">
+                <label for="pick_up">Pick-up location: </label>
+                <input type="text" name="pick_up" class="form-control" value="{{ride.pick_up}}">
+            </div>
+            <br>
+            <div class="d-flex justify-content-evenly">
+                <label for="details">Details: </label>
+                <textarea name="details" cols="30" rows="3">{{ride.details}}</textarea>
+            </div>
+            <input type="submit" value="Update" class="btn btn-success">
+        </form>
+    </div>
+</body>
